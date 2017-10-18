@@ -1,4 +1,4 @@
-package br.com.betogontijo.sbgbeans.indexer;
+package br.com.betogontijo.sbgbeans;
 
 import java.util.ArrayList;
 import java.util.HashMap;

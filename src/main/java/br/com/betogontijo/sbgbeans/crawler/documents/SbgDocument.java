@@ -10,12 +10,14 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "document")
 public class SbgDocument {
 	@Id
-	@Indexed
+	private int id;
+
+	@Indexed(unique = true)
 	private String uri;
 
-	private Long lastModified;
+	private long lastModified;
 
-	Map<String, int[]> wordsMap;
+	private Map<String, int[]> wordsMap;
 
 	@Transient
 	private String body;
@@ -28,11 +30,11 @@ public class SbgDocument {
 		this.uri = uri;
 	}
 
-	public Long getLastModified() {
+	public long getLastModified() {
 		return lastModified;
 	}
 
-	public void setLastModified(Long lastModified) {
+	public void setLastModified(long lastModified) {
 		this.lastModified = lastModified;
 	}
 
@@ -45,6 +47,22 @@ public class SbgDocument {
 	}
 
 	public boolean isOutDated() {
-		return getLastModified() != null;
+		return getLastModified() <= 0;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public Map<String, int[]> getWordsMap() {
+		return wordsMap;
+	}
+
+	public void setWordsMap(Map<String, int[]> wordsMap) {
+		this.wordsMap = wordsMap;
 	}
 }

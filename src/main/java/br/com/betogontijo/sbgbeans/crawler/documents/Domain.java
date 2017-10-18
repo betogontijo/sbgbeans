@@ -8,9 +8,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Domain {
 
 	@Id
-	@Indexed
+	private int id;
+
+	@Indexed(unique = true)
 	private String uri;
-	
+
 	private byte[] robotsContent;
 
 	public String getUri() {
@@ -28,5 +30,5 @@ public class Domain {
 	public void setRobotsContent(byte[] robotsContent) {
 		this.robotsContent = robotsContent;
 	}
-	
+
 }

@@ -3,6 +3,7 @@ package br.com.betogontijo.sbgbeans.crawler.repositories;
 import java.text.Normalizer;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -22,15 +23,29 @@ public class SbgDocumentRepositoryImpl implements AbstractSbgDocumentRepository 
 	MongoTemplate mongoTemplate;
 
 	@Override
-	public int upsertDocument(String uri, Long lastModified, String body) {
-		Query query = new Query(Criteria.where("uri").is(uri));
+	public void insertAllDocuments(List<SbgDocument> documents) {
+		for (SbgDocument sbgDocument : documents) {
+			sbgDocument.setWordsMap(createWordsMap(sbgDocument.getBody()));
+		}
+		mongoTemplate.insert(documents);
+	}
+
+	@Override
+	public void insertDocument(SbgDocument document) {
+		document.setWordsMap(createWordsMap(document.getBody()));
+		mongoTemplate.insert(document);
+	}
+
+	@Override
+	public int updateDocument(SbgDocument document) {
+		Query query = new Query(Criteria.where("uri").is(document.getUri()));
 		Update update = new Update();
 
-		update.set("uri", uri);
-		update.set("lastModified", lastModified);
-		update.set("wordsMap", createWordsMap(body));
+		update.set("uri", document.getUri());
+		update.set("lastModified", document.getLastModified());
+		update.set("wordsMap", createWordsMap(document.getBody()));
 
-		WriteResult result = mongoTemplate.upsert(query, update, SbgDocument.class);
+		WriteResult result = mongoTemplate.updateFirst(query, update, SbgDocument.class);
 
 		if (result != null)
 			return result.getN();
