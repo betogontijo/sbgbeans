@@ -60,15 +60,16 @@ public class SbgDocumentRepositoryImpl implements AbstractSbgDocumentRepository 
 		while (in.hasNext()) {
 			String word = normalize(in.next());
 			if (!word.isEmpty()) {
+				int[] positions;
 				if (wordsMap.get(word) != null) {
-					int[] positions = wordsMap.get(word);
-					int[] newPositions = Arrays.copyOf(positions, positions.length + 1);
-					newPositions[positions.length] = pos++;
+					positions = wordsMap.get(word);
+					positions = Arrays.copyOf(positions, positions.length + 1);
+					positions[positions.length - 1] = pos++;
 				} else {
-					int[] positions = new int[1];
+					positions = new int[1];
 					positions[0] = pos++;
-					wordsMap.put(word, positions);
 				}
+				wordsMap.put(word, positions);
 			}
 		}
 		in.close();

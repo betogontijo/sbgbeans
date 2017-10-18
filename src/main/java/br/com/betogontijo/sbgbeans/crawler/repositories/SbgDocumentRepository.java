@@ -8,4 +8,5 @@ public interface SbgDocumentRepository extends MongoRepository<SbgDocument, Stri
 
 	SbgDocument findByUri(String uri);
 
+	SbgDocument findById(int id);
 }

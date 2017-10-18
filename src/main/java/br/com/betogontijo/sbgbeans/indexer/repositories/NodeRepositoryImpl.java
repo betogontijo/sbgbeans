@@ -2,7 +2,6 @@ package br.com.betogontijo.sbgbeans.indexer.repositories;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,13 +22,13 @@ public class NodeRepositoryImpl implements AbstractNodeRepository {
 	MongoTemplate mongoTemplate;
 
 	@Override
-	public int upsertNode(String prefix, InvertedList invertedList, Map<Character, Node> children) {
-		Query query = new Query(Criteria.where("prefix").is(prefix));
+	public int upsertNode(Node node) {
+		Query query = new Query(Criteria.where("children").not());
 		Update update = new Update();
-
-		update.set("invertedList", compress(invertedList));
-		update.set("children", children);
-
+		if (node.getInvertedList() != null) {
+			update.set("invertedList", compress(node.getInvertedList()));
+		}
+		update.set("children", node.getChildren());
 		WriteResult result = mongoTemplate.upsert(query, update, Node.class);
 
 		if (result != null)

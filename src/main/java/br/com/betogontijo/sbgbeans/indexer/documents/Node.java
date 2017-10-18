@@ -11,7 +11,7 @@ public class Node {
 
 	@Id
 	@Indexed
-	private String prefix;
+	private int id;
 
 	private Map<Character, Node> children;
 
