@@ -3,7 +3,6 @@ package br.com.betogontijo.sbgbeans.crawler.repositories;
 import java.text.Normalizer;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -23,14 +22,6 @@ public class SbgDocumentRepositoryImpl implements AbstractSbgDocumentRepository 
 	MongoTemplate mongoTemplate;
 
 	@Override
-	public void insertAllDocuments(List<SbgDocument> documents) {
-		for (SbgDocument sbgDocument : documents) {
-			sbgDocument.setWordsMap(createWordsMap(sbgDocument.getBody()));
-		}
-		mongoTemplate.insert(documents);
-	}
-
-	@Override
 	public void insertDocument(SbgDocument document) {
 		document.setWordsMap(createWordsMap(document.getBody()));
 		mongoTemplate.insert(document);
@@ -41,6 +32,7 @@ public class SbgDocumentRepositoryImpl implements AbstractSbgDocumentRepository 
 		Query query = new Query(Criteria.where("uri").is(document.getUri()));
 		Update update = new Update();
 
+		update.set("id", document.getId());
 		update.set("uri", document.getUri());
 		update.set("lastModified", document.getLastModified());
 		update.set("wordsMap", createWordsMap(document.getBody()));

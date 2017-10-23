@@ -1,7 +1,5 @@
 package br.com.betogontijo.sbgbeans.crawler.repositories;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -11,17 +9,11 @@ import org.springframework.data.mongodb.core.query.Update;
 import com.mongodb.WriteResult;
 
 import br.com.betogontijo.sbgbeans.crawler.documents.Domain;
-import br.com.betogontijo.sbgbeans.crawler.documents.SbgDocument;
 
 public class DomainRepositoryImpl implements AbstractDomainRepository {
 
 	@Autowired
 	MongoTemplate mongoTemplate;
-
-	@Override
-	public void insertAllDomains(List<Domain> domains) {
-		mongoTemplate.insert(domains);
-	}
 
 	@Override
 	public void insertDomain(Domain domain) {
@@ -34,9 +26,9 @@ public class DomainRepositoryImpl implements AbstractDomainRepository {
 		Update update = new Update();
 
 		update.set("uri", domain.getUri());
-		update.set("robotsContent", domain.getUri());
+		update.set("robotsContent", domain.getRobotsContent());
 
-		WriteResult result = mongoTemplate.updateFirst(query, update, SbgDocument.class);
+		WriteResult result = mongoTemplate.updateFirst(query, update, Domain.class);
 
 		if (result != null)
 			return result.getN();
