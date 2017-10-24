@@ -19,6 +19,8 @@ public class SbgDocument {
 
 	private Map<String, int[]> wordsMap;
 
+	private byte[] robotsContent;
+
 	@Transient
 	private String body;
 
@@ -64,5 +66,13 @@ public class SbgDocument {
 
 	public void setWordsMap(Map<String, int[]> wordsMap) {
 		this.wordsMap = wordsMap;
+	}
+
+	public byte[] getRobotsContent() {
+		return robotsContent;
+	}
+
+	public void setRobotsContent(byte[] robotsContent) {
+		this.robotsContent = robotsContent;
 	}
 }
