@@ -7,4 +7,6 @@ public interface AbstractSbgDocumentRepository {
 	void insertDocument(SbgDocument document);
 
 	int updateDocument(SbgDocument document);
+
+	int upsertDocument(SbgDocument document);
 }

@@ -8,7 +8,9 @@ public interface AbstractNodeRepository {
 
 	void insertNode(Node node);
 
-	int insertAllNodes(List<Node> nodes);
-
 	int updateNode(Node node);
+
+	int upsertNode(Node node);
+
+	int insertAllNodes(List<Node> nodes);
 }

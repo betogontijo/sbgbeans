@@ -47,24 +47,26 @@ public class SbgDocumentRepositoryImpl implements AbstractSbgDocumentRepository 
 
 	public Map<String, int[]> createWordsMap(String body) {
 		Map<String, int[]> wordsMap = new HashMap<String, int[]>();
-		Scanner in = new Scanner(body);
-		int pos = 0;
-		while (in.hasNext()) {
-			String word = normalize(in.next());
-			if (!word.isEmpty()) {
-				int[] positions;
-				if (wordsMap.get(word) != null) {
-					positions = wordsMap.get(word);
-					positions = Arrays.copyOf(positions, positions.length + 1);
-					positions[positions.length - 1] = pos++;
-				} else {
-					positions = new int[1];
-					positions[0] = pos++;
+		if (body != null && !body.isEmpty()) {
+			Scanner in = new Scanner(body);
+			int pos = 0;
+			while (in.hasNext()) {
+				String word = normalize(in.next());
+				if (!word.isEmpty()) {
+					int[] positions;
+					if (wordsMap.get(word) != null) {
+						positions = wordsMap.get(word);
+						positions = Arrays.copyOf(positions, positions.length + 1);
+						positions[positions.length - 1] = pos++;
+					} else {
+						positions = new int[1];
+						positions[0] = pos++;
+					}
+					wordsMap.put(word, positions);
 				}
-				wordsMap.put(word, positions);
 			}
+			in.close();
 		}
-		in.close();
 		return wordsMap;
 	}
 
@@ -75,6 +77,24 @@ public class SbgDocumentRepositoryImpl implements AbstractSbgDocumentRepository 
 			string = string.replaceAll("[^a-z0-9\\s]", "");
 		}
 		return string;
+	}
+
+	@Override
+	public int upsertDocument(SbgDocument document) {
+		Query query = new Query(Criteria.where("uri").is(document.getUri()));
+		Update update = new Update();
+
+		update.set("id", document.getId());
+		update.set("uri", document.getUri());
+		update.set("lastModified", document.getLastModified());
+		update.set("wordsMap", createWordsMap(document.getBody()));
+
+		WriteResult result = mongoTemplate.upsert(query, update, SbgDocument.class);
+
+		if (result != null)
+			return result.getN();
+		else
+			return 0;
 	}
 
 }

@@ -13,7 +13,7 @@ import me.lemire.integercompression.differential.IntegratedIntCompressor;
 @Document(collection = "node")
 public class Node {
 
-	@Indexed(unique = true)
+	@Indexed
 	private String word;
 
 	private List<Integer> docRefList;

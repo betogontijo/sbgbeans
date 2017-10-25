@@ -1,5 +1,6 @@
 package br.com.betogontijo.sbgbeans.indexer.repositories;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.data.util.Pair;
 
 import com.mongodb.BulkWriteResult;
 import com.mongodb.WriteResult;
@@ -26,29 +28,13 @@ public class NodeRepositoryImpl implements AbstractNodeRepository {
 	}
 
 	@Override
-	public int insertAllNodes(List<Node> nodes) {
-		BulkOperations bulkOps = mongoTemplate.bulkOps(BulkMode.ORDERED, Node.class);
-		for (Node node : nodes) {
-			Query query = new Query(Criteria.where("word").is(node.getWord()));
-			Update update = new Update();
-			update.set("docRefList", node.getDocRefList());
-			update.set("occurrencesList", node.getOccurrencesList());
-			bulkOps.upsert(query, update);
-		}
-		BulkWriteResult result = bulkOps.execute();
-
-		if (result != null)
-			return result.getInsertedCount() + result.getModifiedCount();
-		else
-			return 0;
-	}
-
-	@Override
 	public int updateNode(Node node) {
 		Query query = new Query(Criteria.where("word").is(node.getWord()));
 		Update update = new Update();
-		update.set("docRefList", node.getDocRefList());
-		update.set("occurrencesList", node.getOccurrencesList());
+		update.set("word", node.getWord());
+		update.addToSet("docRefList").each(node.getDocRefList());
+		update.addToSet("occurrencesList").each(node.getOccurrencesList());
+		update.set("isCompressed", node.isCompressed());
 
 		WriteResult result = mongoTemplate.updateFirst(query, update, Node.class);
 
@@ -57,5 +43,52 @@ public class NodeRepositoryImpl implements AbstractNodeRepository {
 		else
 			return 0;
 	}
+
+	@Override
+	public int upsertNode(Node node) {
+		Query query = new Query(Criteria.where("word").is(node.getWord()));
+		Update update = new Update();
+		update.set("word", node.getWord());
+		update.addToSet("docRefList").each(node.getDocRefList());
+		update.addToSet("occurrencesList").each(node.getOccurrencesList());
+		update.set("isCompressed", node.isCompressed());
+
+		WriteResult result = mongoTemplate.upsert(query, update, Node.class);
+
+		if (result != null)
+			return result.getN();
+		else
+			return 0;
+	}
+
+	@Override
+	public int insertAllNodes(List<Node> nodes) {
+		List<Pair<Query, Update>> updates = new ArrayList<Pair<Query, Update>>();
+		for (Node node : nodes) {
+			Query query = new Query(Criteria.where("word").is(node.getWord()));
+			Update update = new Update();
+			update.set("word", node.getWord());
+			update.addToSet("docRefList").each(node.getOccurrencesList());
+			update.addToSet("occurrencesList").each(node.getOccurrencesList());
+			update.set("isCompressed", node.isCompressed());
+			updates.add(Pair.of(query, update));
+		}
+		BulkOperations bulkOps = mongoTemplate.bulkOps(BulkMode.UNORDERED, Node.class);
+		BulkWriteResult result = bulkOps.upsert(updates).execute();
+
+		if (result != null)
+			return result.getInsertedCount() + result.getModifiedCount();
+		else
+			return 0;
+	}
+
+	// @Override
+	// public int insertAllNodes(List<Node> nodes) {
+	// int updates = 0;
+	// for (Node node : nodes) {
+	// updates += upsertNode(node);
+	// }
+	// return updates;
+	// }
 
 }

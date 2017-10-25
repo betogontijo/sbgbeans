@@ -7,6 +7,8 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import net.minidev.json.annotate.JsonIgnore;
+
 @Document(collection = "document")
 public class SbgDocument {
 	@Id
@@ -68,10 +70,12 @@ public class SbgDocument {
 		this.wordsMap = wordsMap;
 	}
 
+	@JsonIgnore
 	public byte[] getRobotsContent() {
 		return robotsContent;
 	}
 
+	@JsonIgnore
 	public void setRobotsContent(byte[] robotsContent) {
 		this.robotsContent = robotsContent;
 	}
