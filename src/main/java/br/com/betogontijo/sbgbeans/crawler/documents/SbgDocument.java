@@ -16,6 +16,8 @@ public class SbgDocument {
 
 	@Indexed(unique = true)
 	private String uri;
+	
+	private String title;
 
 	private long lastModified;
 
@@ -78,5 +80,13 @@ public class SbgDocument {
 	@JsonIgnore
 	public void setRobotsContent(byte[] robotsContent) {
 		this.robotsContent = robotsContent;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
 	}
 }
