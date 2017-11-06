@@ -85,4 +85,52 @@ public class SbgDocument {
 	public void setTitle(String title) {
 		this.title = title;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		SbgDocument other = (SbgDocument) obj;
+		if (this.getId() != other.getId()) {
+			return false;
+		}
+		if (this.getTitle() == null) {
+			if (other.getTitle() != null) {
+				return false;
+			}
+		} else if (!this.getTitle().equals(other.getTitle())) {
+			return false;
+		}
+		if (this.getUri() == null) {
+			if (other.getUri() != null) {
+				return false;
+			}
+		} else if (!this.getUri().equals(other.getUri())) {
+			return false;
+		}
+		// if (this.getBody() == null) {
+		// if (other.getBody() != null) {
+		// return false;
+		// }
+		// } else if (!this.getBody().equals(other.getBody())) {
+		// return false;
+		// }
+		// if (this.getLastModified() != other.getLastModified()) {
+		// return false;
+		// }
+		// if (this.getRobotsContent() == null) {
+		// if (other.getRobotsContent() != null) {
+		// return false;
+		// }
+		// } else if (!this.getRobotsContent().equals(this.getRobotsContent()))
+		// {
+		// return false;
+		// }
+		// if (this.getWordsMap() == null) {
+		// if (other.getWordsMap() != null) {
+		// return false;
+		// }
+		// } else if (!this.getWordsMap().equals(other.getWordsMap())) {
+		// return false;
+		// }
+		return true;
+	}
 }

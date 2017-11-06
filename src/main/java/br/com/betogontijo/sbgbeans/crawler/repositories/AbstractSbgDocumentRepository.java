@@ -1,5 +1,7 @@
 package br.com.betogontijo.sbgbeans.crawler.repositories;
 
+import java.util.List;
+
 import br.com.betogontijo.sbgbeans.crawler.documents.SbgDocument;
 
 public interface AbstractSbgDocumentRepository {
@@ -9,4 +11,6 @@ public interface AbstractSbgDocumentRepository {
 	int updateDocument(SbgDocument document);
 
 	int upsertDocument(SbgDocument document);
+
+	List<SbgDocument> findByWord(String word);
 }

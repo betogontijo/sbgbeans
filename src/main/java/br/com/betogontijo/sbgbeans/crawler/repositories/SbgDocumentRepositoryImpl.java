@@ -3,6 +3,7 @@ package br.com.betogontijo.sbgbeans.crawler.repositories;
 import java.text.Normalizer;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -95,6 +96,12 @@ public class SbgDocumentRepositoryImpl implements AbstractSbgDocumentRepository 
 			return result.getN();
 		else
 			return 0;
+	}
+
+	@Override
+	public List<SbgDocument> findByWord(String word) {
+		Query query = new Query(Criteria.where("wordsMap." + word).exists(true));
+		return mongoTemplate.find(query, SbgDocument.class);
 	}
 
 }
