@@ -34,6 +34,7 @@ public class SbgDocumentRepositoryImpl implements AbstractSbgDocumentRepository 
 		Update update = new Update();
 
 		update.set("id", document.getId());
+		update.set("title", document.getTitle());
 		update.set("uri", document.getUri());
 		update.set("lastModified", document.getLastModified());
 		update.set("wordsMap", createWordsMap(document.getBody()));
@@ -87,6 +88,7 @@ public class SbgDocumentRepositoryImpl implements AbstractSbgDocumentRepository 
 
 		update.set("id", document.getId());
 		update.set("uri", document.getUri());
+		update.set("title", document.getTitle());
 		update.set("lastModified", document.getLastModified());
 		update.set("wordsMap", createWordsMap(document.getBody()));
 
