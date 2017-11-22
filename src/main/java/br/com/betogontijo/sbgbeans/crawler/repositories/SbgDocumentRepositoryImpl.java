@@ -1,10 +1,7 @@
 package br.com.betogontijo.sbgbeans.crawler.repositories;
 
-import java.text.Normalizer;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +13,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import com.mongodb.WriteResult;
 
 import br.com.betogontijo.sbgbeans.crawler.documents.SbgDocument;
+import br.com.betogontijo.sbgbeans.utils.WordUtils;
 
 public class SbgDocumentRepositoryImpl implements AbstractSbgDocumentRepository {
 
@@ -24,7 +22,7 @@ public class SbgDocumentRepositoryImpl implements AbstractSbgDocumentRepository 
 
 	@Override
 	public void insertDocument(SbgDocument document) {
-		document.setWordsMap(createWordsMap(document.getBody()));
+		document.setWordsList(createWordsList(document.getBody()));
 		mongoTemplate.insert(document);
 	}
 
@@ -37,7 +35,7 @@ public class SbgDocumentRepositoryImpl implements AbstractSbgDocumentRepository 
 		update.set("title", document.getTitle());
 		update.set("uri", document.getUri());
 		update.set("lastModified", document.getLastModified());
-		update.set("wordsMap", createWordsMap(document.getBody()));
+		update.set("wordsList", createWordsList(document.getBody()));
 
 		WriteResult result = mongoTemplate.updateFirst(query, update, SbgDocument.class);
 
@@ -47,38 +45,19 @@ public class SbgDocumentRepositoryImpl implements AbstractSbgDocumentRepository 
 			return 0;
 	}
 
-	public Map<String, int[]> createWordsMap(String body) {
-		Map<String, int[]> wordsMap = new HashMap<String, int[]>();
+	public List<String> createWordsList(String body) {
+		List<String> wordsList = new ArrayList<String>();
 		if (body != null && !body.isEmpty()) {
 			Scanner in = new Scanner(body);
-			int pos = 0;
 			while (in.hasNext()) {
-				String word = normalize(in.next());
+				String word = WordUtils.normalize(in.next());
 				if (!word.isEmpty()) {
-					int[] positions;
-					if (wordsMap.get(word) != null) {
-						positions = wordsMap.get(word);
-						positions = Arrays.copyOf(positions, positions.length + 1);
-						positions[positions.length - 1] = pos++;
-					} else {
-						positions = new int[1];
-						positions[0] = pos++;
-					}
-					wordsMap.put(word, positions);
+					wordsList.add(word);
 				}
 			}
 			in.close();
 		}
-		return wordsMap;
-	}
-
-	public static String normalize(String string) {
-		if (string != null) {
-			string = string.toLowerCase();
-			string = Normalizer.normalize(string, Normalizer.Form.NFD);
-			string = string.replaceAll("[^a-z0-9\\s]", "");
-		}
-		return string;
+		return wordsList;
 	}
 
 	@Override
@@ -90,7 +69,7 @@ public class SbgDocumentRepositoryImpl implements AbstractSbgDocumentRepository 
 		update.set("uri", document.getUri());
 		update.set("title", document.getTitle());
 		update.set("lastModified", document.getLastModified());
-		update.set("wordsMap", createWordsMap(document.getBody()));
+		update.set("wordsList", createWordsList(document.getBody()));
 
 		WriteResult result = mongoTemplate.upsert(query, update, SbgDocument.class);
 
@@ -102,7 +81,7 @@ public class SbgDocumentRepositoryImpl implements AbstractSbgDocumentRepository 
 
 	@Override
 	public List<SbgDocument> findByWord(String word) {
-		Query query = new Query(Criteria.where("wordsMap." + word).exists(true));
+		Query query = new Query(Criteria.where("wordsList").in(word));
 		return mongoTemplate.find(query, SbgDocument.class);
 	}
 

@@ -32,8 +32,7 @@ public class NodeRepositoryImpl implements AbstractNodeRepository {
 		Query query = new Query(Criteria.where("word").is(node.getWord()));
 		Update update = new Update();
 		update.set("word", node.getWord());
-		update.set("docRefList", node.getDocRefList());
-		update.set("occurrencesList", node.getOccurrencesList());
+		update.set("invertedList", node.getInvertedList());
 		update.set("isCompressed", node.isCompressed());
 
 		WriteResult result = mongoTemplate.updateFirst(query, update, Node.class);
@@ -49,8 +48,7 @@ public class NodeRepositoryImpl implements AbstractNodeRepository {
 		Query query = new Query(Criteria.where("word").is(node.getWord()));
 		Update update = new Update();
 		update.set("word", node.getWord());
-		update.addToSet("docRefList").each(node.getDocRefList());
-		update.addToSet("occurrencesList").each(node.getOccurrencesList());
+		update.set("docRefList", node.getInvertedList());
 		update.set("isCompressed", node.isCompressed());
 
 		WriteResult result = mongoTemplate.upsert(query, update, Node.class);
@@ -68,8 +66,7 @@ public class NodeRepositoryImpl implements AbstractNodeRepository {
 			Query query = new Query(Criteria.where("word").is(node.getWord()));
 			Update update = new Update();
 			update.set("word", node.getWord());
-			update.addToSet("docRefList").each(node.getOccurrencesList());
-			update.addToSet("occurrencesList").each(node.getOccurrencesList());
+			update.set("docRefList", node.getInvertedList());
 			update.set("isCompressed", node.isCompressed());
 			updates.add(Pair.of(query, update));
 		}

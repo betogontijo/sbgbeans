@@ -1,6 +1,6 @@
 package br.com.betogontijo.sbgbeans.crawler.documents;
 
-import java.util.Map;
+import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -19,7 +19,7 @@ public class SbgDocument {
 
 	private long lastModified;
 
-	private Map<String, int[]> wordsMap;
+	private List<String> wordsList;
 
 	private byte[] robotsContent;
 
@@ -62,12 +62,12 @@ public class SbgDocument {
 		this.id = id;
 	}
 
-	public Map<String, int[]> getWordsMap() {
-		return wordsMap;
+	public List<String> getWordsList() {
+		return wordsList;
 	}
 
-	public void setWordsMap(Map<String, int[]> wordsMap) {
-		this.wordsMap = wordsMap;
+	public void setWordsList(List<String> wordsList) {
+		this.wordsList = wordsList;
 	}
 
 	public byte[] getRobotsContent() {
