@@ -13,4 +13,8 @@ public interface AbstractNodeRepository {
 	int upsertNode(Node node);
 
 	int insertAllNodes(List<Node> nodes);
+
+	boolean saveDocumentsIndexed(int count);
+
+	int getCurrentDocumentsIndexed();
 }

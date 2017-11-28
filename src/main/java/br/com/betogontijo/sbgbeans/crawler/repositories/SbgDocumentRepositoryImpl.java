@@ -1,6 +1,7 @@
 package br.com.betogontijo.sbgbeans.crawler.repositories;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
@@ -83,6 +84,11 @@ public class SbgDocumentRepositoryImpl implements AbstractSbgDocumentRepository 
 	public List<SbgDocument> findByWord(String word) {
 		Query query = new Query(Criteria.where("wordsList").in(word));
 		return mongoTemplate.find(query, SbgDocument.class);
+	}
+
+	@Override
+	public Iterator<SbgDocument> iterator(int skip) {
+		return mongoTemplate.stream(new Query().noCursorTimeout().skip(skip), SbgDocument.class);
 	}
 
 }

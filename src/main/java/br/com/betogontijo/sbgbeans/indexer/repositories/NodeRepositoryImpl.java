@@ -2,11 +2,13 @@ package br.com.betogontijo.sbgbeans.indexer.repositories;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.BulkOperations.BulkMode;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
@@ -32,7 +34,7 @@ public class NodeRepositoryImpl implements AbstractNodeRepository {
 		Query query = new Query(Criteria.where("word").is(node.getWord()));
 		Update update = new Update();
 		update.set("word", node.getWord());
-		update.set("invertedList", node.getInvertedList());
+		update.addToSet("invertedList").each(node.getInvertedList());
 		update.set("isCompressed", node.isCompressed());
 
 		WriteResult result = mongoTemplate.updateFirst(query, update, Node.class);
@@ -48,7 +50,9 @@ public class NodeRepositoryImpl implements AbstractNodeRepository {
 		Query query = new Query(Criteria.where("word").is(node.getWord()));
 		Update update = new Update();
 		update.set("word", node.getWord());
-		update.set("docRefList", node.getInvertedList());
+		for (Entry<Integer, int[]> entry : node.getInvertedList().entrySet()) {
+			update.set("invertedList." + entry.getKey(), entry.getValue());
+		}
 		update.set("isCompressed", node.isCompressed());
 
 		WriteResult result = mongoTemplate.upsert(query, update, Node.class);
@@ -77,6 +81,39 @@ public class NodeRepositoryImpl implements AbstractNodeRepository {
 			return result.getInsertedCount() + result.getModifiedCount();
 		else
 			return 0;
+	}
+
+	@Document
+	class DocumentCount {
+		private int count;
+
+		public int getCount() {
+			return count;
+		}
+
+		public DocumentCount setCount(int count) {
+			this.count = count;
+			return this;
+		}
+	}
+
+	@Override
+	public boolean saveDocumentsIndexed(int count) {
+		try {
+			mongoTemplate.insert(new DocumentCount().setCount(count));
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	@Override
+	public int getCurrentDocumentsIndexed() {
+		try {
+			return mongoTemplate.findOne(new Query(), DocumentCount.class).getCount();
+		} catch (NullPointerException e) {
+			return 0;
+		}
 	}
 
 	// @Override
